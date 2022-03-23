@@ -1,27 +1,35 @@
 
-//form element containing entry form for Task and task type dropdown
+// form element containing entry form for Task and task type dropdown
 var formEl = document.querySelector("#task-form");
-//container element for to-do tasks
+// container element for to-do tasks
 var tasksToDoEl = document.querySelector("#tasks-to-do");
 
 var taskFormHandler = function (event) {
-    //stops page refresh when submitting a new task
+    // stops page refresh when submitting a new task
     event.preventDefault();
     var taskNameInput = document.querySelector("input[name='task-name']").value;
     var taskTypeInput = document.querySelector("select[name= 'task-type']").value;
 
-    //package up data as an object
+    // check if input values are empty
+    if (!taskNameInput || !taskTypeInput) {
+        alert("You need to fill out the task form!");
+        return false;
+    };
+    // package up data as an object
     var taskDataObj = {
         name: taskNameInput,
         type: taskTypeInput
     };
+
+    //clears content of previously created task
+    formEl.reset();
 
     // send it as an argumment to createTaskEl
     createTaskEl(taskDataObj);
 };
 
 var createTaskEl = function (taskDataObj) {
-    //create list item
+    // create list item
     var listItemEl = document.createElement("li");
     listItemEl.className = "task-item";
 
