@@ -1,6 +1,7 @@
 // task ID
 var taskIdCounter = 0;
-
+// array of tasks
+var tasks = [];
 // form element containing entry form for Task and task type dropdown
 var formEl = document.querySelector("#task-form");
 // container elements for to-do, in-progress, and completed tasks
@@ -35,7 +36,8 @@ var taskFormHandler = function (event) {
         // package up data as an object
         var taskDataObj = {
             name: taskNameInput,
-            type: taskTypeInput
+            type: taskTypeInput,
+            status: "to do"
         };
         // send created task data object as an argumment to createTaskEl
         createTaskEl(taskDataObj);
@@ -60,6 +62,10 @@ var createTaskEl = function (taskDataObj) {
     var taskActionsEl = createTaskActions(taskIdCounter);
     listItemEl.appendChild(taskActionsEl);
     tasksToDoEl.appendChild(listItemEl);
+
+    // add id to taskDataObj as add object to tasks[]
+    taskDataObj.id = taskIdCounter;
+    tasks.push(taskDataObj);
 
     // increase task counter for next unique id
     taskIdCounter++;
@@ -119,6 +125,14 @@ var completeEditTask = function (taskName, taskType, taskId) {
     taskSelected.querySelector("h3.task-name").textContent = taskName;
     taskSelected.querySelector("span.task-type").textContent = taskType;
 
+    // loop through tasks array and task object with new content
+    for (i = 0; i < tasks.length; i++) {
+        if (tasks[i].id === parseInt(taskId)) {
+            tasks[i].name = taskName;
+            tasks[i].type = taskType;
+        };
+    };
+
     alert("Task Updated!");
 
     // remove the task ID from the form
@@ -148,23 +162,30 @@ var taskButtonHandler = function (event) {
 
 // task status change
 var taskStatusChangeHandler = function (event) {
-//   get the task item's id
-var taskId = event.target.getAttribute("data-task-id");
-// get the currently selected option's value and convert to lowercase
-var statusValue = event.target.value.toLowerCase();
+    //   get the task item's id
+    var taskId = event.target.getAttribute("data-task-id");
+    // get the currently selected option's value and convert to lowercase
+    var statusValue = event.target.value.toLowerCase();
 
-// find the parent task item element based on the id
-var taskSelected = document.querySelector(".task-item[data-task-id='" + taskId + "']");
-if(statusValue === "to do"){
-    tasksToDoEl.appendChild(taskSelected);
-}
-else if(statusValue === "in progress"){
-    tasksInProgressEl.appendChild(taskSelected);
-}
-else if(statusValue === "completed"){
-    tasksCompletedEl.appendChild(taskSelected);
-}
- 
+
+    // find the parent task item element based on the id
+    var taskSelected = document.querySelector(".task-item[data-task-id='" + taskId + "']");
+    if (statusValue === "to do") {
+        tasksToDoEl.appendChild(taskSelected);
+    }
+    else if (statusValue === "in progress") {
+        tasksInProgressEl.appendChild(taskSelected);
+    }
+    else if (statusValue === "completed") {
+        tasksCompletedEl.appendChild(taskSelected);
+    }
+
+    // update task's in tasks array
+    for (var i = 0; i < tasks.length; i++) {
+        if (tasks[i].id === parseInt(taskId)) {
+            tasks[i].status = statusValue;
+        }
+    };
 };
 
 
@@ -188,6 +209,20 @@ var editTask = function (taskId) {
 var deleteTask = function (taskId) {
     var taskSelected = document.querySelector((".task-item[data-task-id='" + taskId + "']"));
     taskSelected.remove();
+
+    // create new array to hold updated list of tasks
+    var updatedTaskArr = [];
+
+    // loop through current tasks
+    for (var i = 0; i < tasks.length; i++) {
+        // if tasks[i].id doesn't match the value of taskId, let's keep that task and push it into the new array
+        if (tasks[i].id !== parseInt(taskId)) {
+            updatedTaskArr.push(tasks[i]);
+        }
+    }
+
+    // reassign tasks array to be the same as updatedTaskArr
+    tasks = updatedTaskArr;
 };
 
 // Create a new task
